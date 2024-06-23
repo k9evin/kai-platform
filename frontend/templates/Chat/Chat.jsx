@@ -23,7 +23,7 @@ import NavigationIcon from '@/assets/svg/Navigation.svg';
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
 import CenterChatContentNoMessages from './CenterChatContentNoMessages';
-c
+import ChatHistory from './ChatHistory'; // Added component import underneath the CenterChat import
 import ChatSpinner from './ChatSpinner';
 import Message from './Message';
 import styles from './styles';
