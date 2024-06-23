@@ -23,6 +23,7 @@ import NavigationIcon from '@/assets/svg/Navigation.svg';
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
 import CenterChatContentNoMessages from './CenterChatContentNoMessages';
+c
 import ChatSpinner from './ChatSpinner';
 import Message from './Message';
 import styles from './styles';
@@ -44,6 +45,38 @@ import {
 import { firestore } from '@/redux/store';
 import createChatSession from '@/services/chatbot/createChatSession';
 import sendMessage from '@/services/chatbot/sendMessage';
+// Chat Component 
+const Chat = () => {
+  const [message, setMessage] = useState('');
+  const [history, setHistory] = useState([]);
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const newMessage = {
+        id: history.length + 1,
+        timestamp: new Date().toISOString(),
+        message,
+      };
+      setHistory([...history, newMessage]);
+      setMessage('');
+    }
+  };
+
+  return (
+    <div>
+      <ChatHistory history={history} />
+      <TextField
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        label="Type your message"
+        fullWidth
+      />
+      <Button onClick={handleSendMessage} variant="contained" color="primary">
+        Send
+      </Button>
+    </div>
+  );
+};
 
 const ChatInterface = () => {
   const messagesContainerRef = useRef();

@@ -1,12 +1,12 @@
 {
   "projects": {
-    "default": "kai-ai-f63c8"
+    "default": "fir-c2560"
   },
   "targets": {
-    "kai-ai-f63c8": {
+    "fir-c2560": {
       "hosting": {
         "next": [
-          "kai-ai-f63c8"
+          "fir-c2560"
         ]
       }
     }
