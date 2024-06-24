@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+// Importing necessary libraries and components
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
   ArrowDownwardOutlined,
   InfoOutlined,
   Settings,
 } from '@mui/icons-material';
+
 import {
   Button,
   Fade,
@@ -14,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,33 +26,42 @@ import NavigationIcon from '@/assets/svg/Navigation.svg';
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
 import CenterChatContentNoMessages from './CenterChatContentNoMessages';
+
 import ChatHistory from './ChatHistory'; // Added component import underneath the CenterChat import
+
 import ChatSpinner from './ChatSpinner';
+
 import Message from './Message';
+
 import styles from './styles';
 
 import {
-  openInfoChat,
-  resetChat,
-  setChatSession,
   setError,
+  setChatSession,
   setFullyScrolled,
-  setInput,
   setMessages,
   setMore,
+  setOpenInfoChat,
+  setResetChat,
   setSessionLoaded,
   setStreaming,
   setStreamingDone,
   setTyping,
 } from '@/redux/slices/chatSlice';
+
 import { firestore } from '@/redux/store';
+
 import createChatSession from '@/services/chatbot/createChatSession';
+
 import sendMessage from '@/services/chatbot/sendMessage';
+
 // Chat Component 
 const Chat = () => {
+  // Local state for message input and chat history
   const [message, setMessage] = useState('');
   const [history, setHistory] = useState([]);
 
+  // Handle sending a message and updating the history
   const handleSendMessage = () => {
     if (message.trim()) {
       const newMessage = {
@@ -64,13 +76,16 @@ const Chat = () => {
 
   return (
     <div>
+      {/* Displaying chat history */}
       <ChatHistory history={history} />
+      {/* Text field for typing message */}
       <TextField
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         label="Type your message"
         fullWidth
       />
+      {/* Button to send message */}
       <Button onClick={handleSendMessage} variant="contained" color="primary">
         Send
       </Button>
@@ -78,6 +93,7 @@ const Chat = () => {
   );
 };
 
+// Chat Interface Component
 const ChatInterface = () => {
   const messagesContainerRef = useRef();
 
@@ -103,6 +119,7 @@ const ChatInterface = () => {
   const chatMessages = currentSession?.messages;
   const showNewMessageIndicator = !fullyScrolled && streamingDone;
 
+  // Start a new conversation
   const startConversation = async (message) => {
     dispatch(
       setMessages({
@@ -208,6 +225,7 @@ const ChatInterface = () => {
     dispatch(setStreamingDone(false));
   };
 
+  // Handle sending a message
   const handleSendMessage = async () => {
     dispatch(setStreaming(true));
 
@@ -243,6 +261,7 @@ const ChatInterface = () => {
     await sendMessage({ message, id: sessionId }, dispatch);
   };
 
+  // Handle quick reply messages
   const handleQuickReply = async (option) => {
     dispatch(setInput(option));
     dispatch(setStreaming(true));
@@ -265,12 +284,13 @@ const ChatInterface = () => {
     await sendMessage({ message, id: currentSession?.id }, dispatch);
   };
 
-  /* Push Enter */
+  // Handle key down events for sending a message
   const keyDownHandler = async (e) => {
     if (typing || !input || streaming) return;
     if (e.keyCode === 13) handleSendMessage();
   };
 
+  // Render the send icon
   const renderSendIcon = () => {
     return (
       <InputAdornment position="end">
@@ -286,6 +306,7 @@ const ChatInterface = () => {
     );
   };
 
+  // Render the more chat options
   const renderMoreChat = () => {
     if (!more) return null;
     return (
@@ -305,6 +326,7 @@ const ChatInterface = () => {
     );
   };
 
+  // Render the center chat content with messages
   const renderCenterChatContent = () => {
     if (
       !openSettingsChat &&
@@ -345,59 +367,38 @@ const ChatInterface = () => {
     return null;
   };
 
+  // Render the center chat content when there are no messages
   const renderCenterChatContentNoMessages = () => {
     if ((chatMessages?.length === 0 || !chatMessages) && !infoChatOpened)
       return <CenterChatContentNoMessages />;
     return null;
   };
 
-  const renderNewMessageIndicator = () => {
-    return (
-      <Fade in={showNewMessageIndicator}>
-        <Button
-          startIcon={<ArrowDownwardOutlined />}
-          onClick={handleScrollToBottom}
-          {...styles.newMessageButtonProps}
-        />
-      </Fade>
-    );
-  };
-
-  const renderBottomChatContent = () => {
-    if (!openSettingsChat && !infoChatOpened)
+  // Render the scroll to bottom button
+  const renderScrollToBottomButton = () => {
+    if (showNewMessageIndicator)
       return (
-        <Grid {...styles.bottomChatContent.bottomChatContentGridProps}>
-          <Grid {...styles.bottomChatContent.chatInputGridProps(!!error)}>
-            <TextField
-              value={input}
-              onChange={(e) => dispatch(setInput(e.currentTarget.value))}
-              onKeyUp={keyDownHandler}
-              error={!!error}
-              helperText={error}
-              disabled={!!error}
-              focused={false}
-              {...styles.bottomChatContent.chatInputProps(
-                renderSendIcon,
-                !!error,
-                input
-              )}
-            />
-          </Grid>
-        </Grid>
+        <Fade in={showNewMessageIndicator}>
+          <IconButton
+            {...styles.bottomChatContent.floatingButtonProps}
+            onClick={handleScrollToBottom}
+          >
+            <ArrowDownwardOutlined />
+          </IconButton>
+        </Fade>
       );
-
     return null;
   };
 
   return (
-    <Grid {...styles.mainGridProps}>
+    <Grid {...styles.rootGridProps}>
       {renderMoreChat()}
       {renderCenterChatContent()}
       {renderCenterChatContentNoMessages()}
-      {renderNewMessageIndicator()}
-      {renderBottomChatContent()}
+      {renderScrollToBottomButton()}
     </Grid>
   );
+  
 };
 
 export default ChatInterface;

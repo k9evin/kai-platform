@@ -1,6 +1,9 @@
+// chatSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
+
+import { fetchChatHistory } from './chatActions';// Update the import path as needed
 
 const initialState = {
   input: '',
@@ -20,14 +23,14 @@ const initialState = {
   historyLoaded: false,
   streamingDone: false,
   streaming: false,
+  chatHistory: [], // Add this for storing chat history
 };
 
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    // eslint-disable-next-line no-unused-vars
-    resetChat: (state, _) => ({
+    resetChat: (state) => ({
       ...initialState,
       sessions: state.sessions,
     }),
@@ -124,7 +127,23 @@ const chatSlice = createSlice({
     },
     setExerciseId: (state, action) => {
       state.exerciseId = action.payload;
-    },
+      },
+  },
+
+  // Redux reducer for fetching and storing chat history.
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchChatHistory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchChatHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.chatHistory = action.payload;
+      })
+      .addCase(fetchChatHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -139,7 +158,6 @@ export const {
   closeSettingsChat,
   closeInfoChat,
   setTyping,
-  setBotFeature,
   setFullyScrolled,
   resetChat,
   setExerciseId,
@@ -147,10 +165,9 @@ export const {
   setChatStarted,
   setStreamingDone,
   setSelectedOption,
-  setEMAMessages,
-  resetExplainMyAnswer,
   setStreaming,
   setHistoryLoaded,
+  
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
