@@ -15,5 +15,5 @@ export const fetchChatHistory = createAsyncThunk(
       history.push({ id: doc.id, ...doc.data() });
     });
     return history;
-  } 
+  }
 );

@@ -36,18 +36,19 @@ import Message from './Message';
 import styles from './styles';
 
 import {
-  setError,
   setChatSession,
+  setError,
   setFullyScrolled,
+  setInput, // Importing setInput action
   setMessages,
   setMore,
-  setOpenInfoChat,
-  setResetChat,
+  setOpenInfoChat, // Importing setOpenInfoChat action
+  setResetChat, // Importing setResetChat action
   setSessionLoaded,
   setStreaming,
   setStreamingDone,
   setTyping,
-} from '@/redux/slices/chatSlice';
+} from '@/redux/slices/chatSlice'; // Alphabetically sorted imports
 
 import { firestore } from '@/redux/store';
 
@@ -55,7 +56,7 @@ import createChatSession from '@/services/chatbot/createChatSession';
 
 import sendMessage from '@/services/chatbot/sendMessage';
 
-// Chat Component 
+// Chat Component
 const Chat = () => {
   // Local state for message input and chat history
   const [message, setMessage] = useState('');
@@ -151,13 +152,15 @@ const ChatInterface = () => {
     dispatch(setSessionLoaded(true));
   };
 
+  // Clean up on component unmount
   useEffect(() => {
     return () => {
       localStorage.removeItem('sessionId');
-      dispatch(resetChat());
+      dispatch(setResetChat());
     };
   }, []);
 
+  // Listen for updates to the chat session
   useEffect(() => {
     let unsubscribe;
 
@@ -202,6 +205,7 @@ const ChatInterface = () => {
     };
   }, [sessionLoaded]);
 
+  // Handle scrolling in the messages container
   const handleOnScroll = () => {
     const scrolled =
       Math.abs(
@@ -213,6 +217,7 @@ const ChatInterface = () => {
     if (fullyScrolled !== scrolled) dispatch(setFullyScrolled(scrolled));
   };
 
+  // Scroll to the bottom of the messages container
   const handleScrollToBottom = () => {
     messagesContainerRef.current?.scrollTo(
       0,
@@ -317,7 +322,7 @@ const ChatInterface = () => {
         </Grid>
         <Grid
           {...styles.moreChat.contentMoreChatProps}
-          onClick={() => dispatch(openInfoChat())}
+          onClick={() => dispatch(setOpenInfoChat())}
         >
           <InfoOutlined {...styles.moreChat.iconProps} />
           <Typography {...styles.moreChat.titleProps}>Information</Typography>
@@ -398,7 +403,6 @@ const ChatInterface = () => {
       {renderScrollToBottomButton()}
     </Grid>
   );
-  
 };
 
 export default ChatInterface;

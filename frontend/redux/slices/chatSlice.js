@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
-import { fetchChatHistory } from './chatActions';// Update the import path as needed
+import { fetchChatHistory } from './chatActions'; // Update the import path as needed
 
 const initialState = {
   input: '',
@@ -127,7 +127,7 @@ const chatSlice = createSlice({
     },
     setExerciseId: (state, action) => {
       state.exerciseId = action.payload;
-      },
+    },
   },
 
   // Redux reducer for fetching and storing chat history.
@@ -167,7 +167,6 @@ export const {
   setSelectedOption,
   setStreaming,
   setHistoryLoaded,
-  
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
