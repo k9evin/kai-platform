@@ -295,6 +295,14 @@ const ChatInterface = () => {
     if (e.keyCode === 13) handleSendMessage();
   };
 
+  // Attach keyDownHandler to document keydown event listener
+  useEffect(() => {
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, [typing, input, streaming]); // Add dependencies to ensure correct behavior
+
   // Render the send icon
   const renderSendIcon = () => {
     return (
@@ -401,6 +409,7 @@ const ChatInterface = () => {
       {renderCenterChatContent()}
       {renderCenterChatContentNoMessages()}
       {renderScrollToBottomButton()}
+      {renderSendIcon()}
     </Grid>
   );
 };
