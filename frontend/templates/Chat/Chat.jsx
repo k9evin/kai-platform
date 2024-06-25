@@ -410,6 +410,7 @@ const ChatInterface = () => {
       {renderCenterChatContentNoMessages()}
       {renderScrollToBottomButton()}
       {renderSendIcon()}
+      {Chat()}
     </Grid>
   );
 };
