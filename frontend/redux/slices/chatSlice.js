@@ -131,20 +131,20 @@ const chatSlice = createSlice({
   },
 
   // Redux reducer for fetching and storing chat history.
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchChatHistory.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchChatHistory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.chatHistory = action.payload;
-      })
-      .addCase(fetchChatHistory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
-  },
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(fetchChatHistory.pending, (state) => {
+  //       state.loading = true;
+  //     })
+  //     .addCase(fetchChatHistory.fulfilled, (state, action) => {
+  //       state.loading = false;
+  //       state.chatHistory = action.payload;
+  //     })
+  //     .addCase(fetchChatHistory.rejected, (state, action) => {
+  //       state.loading = false;
+  //       state.error = action.error.message;
+  //     });
+  // },
 });
 
 export const {

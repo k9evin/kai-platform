@@ -124,8 +124,8 @@ const styles = {
       color: (theme) => theme.palette.Common.White['100p'],
       background: '#4900E4',
       textTransform: 'capitalize',
-      height: 26,
-      mt: 1.5,
+      height: 25,
+      mt: 0.5,
       '&:hover': {
         background: '#4900E4',
         color: (theme) => theme.palette.Common.White['50p'],
