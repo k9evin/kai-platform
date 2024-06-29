@@ -17,30 +17,30 @@ const HistoryCard = (props) => {
   const renderImage = () => {
     return (
       <Grid {...styles.imageGridProps}>
-        <Image src={logo} alt="kai tool logo" {...styles.imageProps} />
+        <Image src={logo} alt="kai logo" {...styles.imageProps} />
       </Grid>
     );
   };
 
-  const renderTitle = () => {
+  const renderDetails = () => {
     return (
       <Grid {...styles.contentGridProps}>
         <Typography {...styles.dateProps}>{createdDate}</Typography>
         <Typography {...styles.titleProps}>{title}</Typography>
         <Typography {...styles.descriptionProps}>{description}</Typography>
-        <Button {...styles.previewButtonProps}>Preview</Button>
+        <Button {...styles.previewButtonProps} onClick={handleDrawer}>
+          Preview
+        </Button>
       </Grid>
     );
   };
 
   return (
     <Grid {...styles.mainGridProps}>
-      <Card {...styles.cardProps(backgroundImgURL)} onClick={handleDrawer}>
-        <Grid {...styles.historyDetailsGridProps}>
-          {renderImage()}
-          {renderTitle()}
-        </Grid>
-      </Card>
+      <Grid {...styles.historyCardProps}>
+        <Card {...styles.cardProps(backgroundImgURL)}>{renderImage()}</Card>
+        <Grid {...styles.toolDetailsGridProps}>{renderDetails()}</Grid>
+      </Grid>
     </Grid>
   );
 };
