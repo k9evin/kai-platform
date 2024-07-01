@@ -42,18 +42,22 @@ const HistoryDrawer = (props) => {
 
   const renderQuestions = () => {
     return questions.map((question, index) => (
-      <ListItem key={index} {...styles.listItemProps}>
-        <Typography {...styles.questionProps}>{question.question}</Typography>
-        <List {...styles.optionsListProps}>
-          {question.options.map((option, optionIndex) => (
-            <ListItem key={optionIndex} {...styles.listItemProps}>
-              <Typography {...styles.optionProps}>{option}</Typography>
-            </ListItem>
-          ))}
-        </List>
-        <Typography {...styles.answerTextProps}>Answer Key</Typography>
-        <Typography {...styles.answerKeyProps}>{question.answer}</Typography>
-      </ListItem>
+      <div key={index}>
+        <ListItem {...styles.listItemProps}>
+          <Typography {...styles.questionProps}>{question.question}</Typography>
+          <List {...styles.optionsListProps}>
+            {question.options.map((option, optionIndex) => (
+              <ListItem key={optionIndex} {...styles.listItemProps}>
+                <Typography {...styles.optionProps}>{option}</Typography>
+              </ListItem>
+            ))}
+          </List>
+          <Typography {...styles.answerTextProps}>Answer Key</Typography>
+          <Typography {...styles.answerKeyProps}>{question.answer}</Typography>
+        </ListItem>
+        {index < questions.length - 1 && <Divider />}
+        {/* Add Divider here if needed */}
+      </div>
     ));
   };
 
@@ -61,9 +65,11 @@ const HistoryDrawer = (props) => {
     const text = JSON.stringify(data, null, 2); // Format the JSON for readability
     navigator.clipboard
       .writeText(text)
+      /* eslint-disable no-console */
       .then(() => {
         console.log('Text copied to clipboard');
       })
+      /* eslint-disable no-console */
       .catch((err) => {
         console.error('Failed to copy text to clipboard', err);
       });
