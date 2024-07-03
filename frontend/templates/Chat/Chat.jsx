@@ -85,6 +85,9 @@ const Chat = () => {
         onChange={(e) => setMessage(e.target.value)}
         label="Type your message"
         fullWidth
+        InputProps={{
+          style: { color: 'darkblue' },
+        }}
       />
       {/* Button to send message */}
       <Button onClick={handleSendMessage} variant="contained" color="primary">
