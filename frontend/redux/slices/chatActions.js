@@ -1,9 +1,22 @@
 // Redux actions for fetching and storing chat history.
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
-import { db } from '../../firebase/config';
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from 'firebase/firestore';
+
+import firebaseConfig from '../../firebase/config';
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+
+const db = getFirestore(firebaseApp);
 
 export const fetchChatHistory = createAsyncThunk(
   'chat/fetchChatHistory',

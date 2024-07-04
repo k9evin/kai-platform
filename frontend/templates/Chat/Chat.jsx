@@ -12,7 +12,6 @@ import {
   Fade,
   Grid,
   IconButton,
-  InputAdornment,
   TextField,
   Typography,
 } from '@mui/material';
@@ -20,8 +19,6 @@ import {
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import { useDispatch, useSelector } from 'react-redux';
-
-import NavigationIcon from '@/assets/svg/Navigation.svg';
 
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
@@ -74,7 +71,11 @@ const Chat = () => {
       setMessage('');
     }
   };
-
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
   return (
     <div>
       {/* Displaying chat history */}
@@ -83,6 +84,7 @@ const Chat = () => {
       <TextField
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={handleKeyPress} // Add key press handler
         label="Type your message"
         fullWidth
         InputProps={{
@@ -113,7 +115,6 @@ const ChatInterface = () => {
     fullyScrolled,
     streamingDone,
     streaming,
-    error,
   } = useSelector((state) => state.chat);
   const { data: userData } = useSelector((state) => state.user);
 
@@ -222,13 +223,17 @@ const ChatInterface = () => {
 
   // Scroll to the bottom of the messages container
   const handleScrollToBottom = () => {
-    messagesContainerRef.current?.scrollTo(
-      0,
-      messagesContainerRef.current?.scrollHeight,
-      {
+    const messagesContainer = messagesContainerRef.current;
+    const isScrolledToBottom =
+      messagesContainer.scrollHeight - messagesContainer.clientHeight <=
+      messagesContainer.scrollTop + 1;
+
+    if (!isScrolledToBottom) {
+      messagesContainerRef.current?.scrollTo({
+        top: messagesContainerRef.current?.scrollHeight,
         behavior: 'smooth',
-      }
-    );
+      });
+    }
 
     dispatch(setStreamingDone(false));
   };
@@ -305,22 +310,6 @@ const ChatInterface = () => {
       document.removeEventListener('keydown', keyDownHandler);
     };
   }, [typing, input, streaming]); // Add dependencies to ensure correct behavior
-
-  // Render the send icon
-  const renderSendIcon = () => {
-    return (
-      <InputAdornment position="end">
-        <IconButton
-          onClick={handleSendMessage}
-          {...styles.bottomChatContent.iconButtonProps(
-            typing || error || !input || streaming
-          )}
-        >
-          <NavigationIcon />
-        </IconButton>
-      </InputAdornment>
-    );
-  };
 
   // Render the more chat options
   const renderMoreChat = () => {
@@ -412,7 +401,6 @@ const ChatInterface = () => {
       {renderCenterChatContent()}
       {renderCenterChatContentNoMessages()}
       {renderScrollToBottomButton()}
-      {renderSendIcon()}
       {Chat()}
     </Grid>
   );

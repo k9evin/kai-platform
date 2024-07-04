@@ -19,6 +19,7 @@ const ChatHistory = ({ history }) => {
           border: '1px solid #ccc',
           padding: '10px',
           backgroundColor: '#f9f9f9',
+          maxWidth: '300px',
         }}
       >
         {/* Display a title for the chat history */}
