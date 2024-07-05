@@ -33,6 +33,7 @@ import Message from './Message';
 import styles from './styles';
 
 import {
+  resetChat, // Importing setResetChat action
   setChatSession,
   setError,
   setFullyScrolled,
@@ -40,7 +41,6 @@ import {
   setMessages,
   setMore,
   setOpenInfoChat, // Importing setOpenInfoChat action
-  setResetChat, // Importing setResetChat action
   setSessionLoaded,
   setStreaming,
   setStreamingDone,
@@ -57,7 +57,11 @@ import sendMessage from '@/services/chatbot/sendMessage';
 const Chat = () => {
   // Local state for message input and chat history
   const [message, setMessage] = useState('');
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(() => {
+    // Retrieve the saved history from local storage
+    const savedHistory = localStorage.getItem('chatHistory');
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
 
   // Handle sending a message and updating the history
   const handleSendMessage = () => {
@@ -67,8 +71,10 @@ const Chat = () => {
         timestamp: new Date().toISOString(),
         message,
       };
-      setHistory([...history, newMessage]);
+      const newHistory = [...history, newMessage];
+      setHistory([...history, newMessage, newHistory]);
       setMessage('');
+      localStorage.setItem('chatHistory', JSON.stringify(newHistory)); // Save history to local storage
     }
   };
   const handleKeyPress = (e) => {
@@ -160,7 +166,7 @@ const ChatInterface = () => {
   useEffect(() => {
     return () => {
       localStorage.removeItem('sessionId');
-      dispatch(setResetChat());
+      dispatch(resetChat());
     };
   }, []);
 
