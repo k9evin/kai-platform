@@ -72,7 +72,7 @@ const Chat = () => {
         message,
       };
       const newHistory = [...history, newMessage];
-      setHistory([...history, newMessage, newHistory]);
+      setHistory(newHistory);
       setMessage('');
       localStorage.setItem('chatHistory', JSON.stringify(newHistory)); // Save history to local storage
     }
@@ -82,10 +82,15 @@ const Chat = () => {
       handleSendMessage();
     }
   };
+  // Function to clear chat history
+  const handleClearHistory = () => {
+    setHistory([]); // Clear the history state
+    localStorage.removeItem('chatHistory'); // Remove history from local storage
+  };
   return (
     <div>
       {/* Displaying chat history */}
-      <ChatHistory history={history} />
+      <ChatHistory history={history} onClearHistory={handleClearHistory} />
       {/* Text field for typing message */}
       <TextField
         value={message}

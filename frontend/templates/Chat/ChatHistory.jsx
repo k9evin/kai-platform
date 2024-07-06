@@ -1,7 +1,15 @@
 // ChatHistory.jsx
 import React from 'react';
 
-import { List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Close } from '@mui/icons-material'; // Import the Close icon
+
+import {
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 
 // Ensure PropTypes is imported from the correct package
 import PropTypes from 'prop-types';
@@ -10,7 +18,7 @@ import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
 
 // ChatHistory component displays a list of chat messages.
-const ChatHistory = ({ history }) => {
+const ChatHistory = ({ history, onClearHistory }) => {
   return (
     // Draggable
     <Draggable>
@@ -20,8 +28,22 @@ const ChatHistory = ({ history }) => {
           padding: '10px',
           backgroundColor: '#f9f9f9',
           maxWidth: '300px',
+          position: 'relative',
         }}
       >
+        {/* Clear Chat History Button */}
+        <IconButton
+          style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            color: 'black', // Set the color to black
+          }}
+          onClick={onClearHistory} // Add onClick event to trigger clear history
+        >
+          <Close />
+        </IconButton>
+
         {/* Display a title for the chat history */}
         <Typography variant="h6">Chat History</Typography>
         <List>
@@ -51,6 +73,7 @@ ChatHistory.propTypes = {
       message: PropTypes.string.isRequired,
     })
   ).isRequired,
+  onClearHistory: PropTypes.func.isRequired, // Ensure onClearHistory is required
 };
 
 export default ChatHistory;
