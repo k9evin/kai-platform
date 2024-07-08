@@ -12,6 +12,12 @@ const HistoryCard = (props) => {
   const { backgroundImgURL, logo, title, description, createdDate } = props;
   const [open, setOpen] = useState(false);
 
+  const [history, setHistory] = useState(() => {
+    const savedHistory = localStorage.getItem('chatHistory');
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
+  const [showHistory, setShowHistory] = useState(false);
+
   const defaultData = {
     createdData: new Date().toLocaleDateString(),
     title: 'Video Comprehension Questions',
@@ -27,6 +33,11 @@ const HistoryCard = (props) => {
 
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  // Function to toggle chat history visibility
+  const toggleShowHistory = () => {
+    setShowHistory((prev) => !prev);
   };
 
   const renderImage = () => {
@@ -56,7 +67,19 @@ const HistoryCard = (props) => {
         <Card {...styles.cardProps(backgroundImgURL)}>{renderImage()}</Card>
         <Grid {...styles.toolDetailsGridProps}>{renderDetails()}</Grid>
       </Grid>
-      <HistoryDrawer open={open} onClose={toggleDrawer} data={defaultData} />
+      {/* HistoryDrawer component */}
+      <HistoryDrawer
+        open={open}
+        onClose={toggleDrawer}
+        data={defaultData}
+        showHistory={showHistory}
+        toggleShowHistory={toggleShowHistory}
+        history={history}
+        clearHistory={() => {
+          setHistory([]);
+          localStorage.removeItem('chatHistory');
+        }}
+      />
     </Grid>
   );
 };

@@ -13,7 +13,15 @@ import {
 import styles from './styles';
 
 const HistoryDrawer = (props) => {
-  const { open, onClose, data } = props;
+  const {
+    open,
+    onClose,
+    data,
+    showHistory,
+    toggleShowHistory,
+    history,
+    clearHistory,
+  } = props;
 
   const defaultData = {
     createdData: new Date().toLocaleDateString(),
@@ -107,12 +115,53 @@ const HistoryDrawer = (props) => {
     );
   };
 
+  const renderChatHistory = () => (
+    <div>
+      <Typography variant="h6" style={{ color: '#1E88E5' }}>
+        Chat History
+      </Typography>
+      <div>
+        {history.map((item) => (
+          <div key={item.id}>
+            <Typography variant="body2" style={{ color: '#1E88E5' }}>
+              {item.message}
+            </Typography>
+            <Typography variant="caption" style={{ color: '#1E88E5' }}>
+              {new Date(item.timestamp).toLocaleString()}
+            </Typography>
+            <hr />
+          </div>
+        ))}
+      </div>
+      <Button onClick={clearHistory} variant="contained" color="secondary">
+        Clear History
+      </Button>
+    </div>
+  );
+
   return (
     <Grid {...styles.mainGridProps}>
       <Drawer open={open} onClose={onClose} {...styles.drawerGridProps}>
         {renderHeader()}
         {renderQuestions()}
         {renderFooterButtons()}
+
+        {/* Show/Hide History Button */}
+        <div style={{ marginTop: '10px', textAlign: 'center' }}>
+          <Typography variant="body1" style={{ color: '#333333' }}>
+            Want to see chat history?
+          </Typography>
+          <Button
+            onClick={toggleShowHistory}
+            variant="contained"
+            color="secondary"
+          >
+            {showHistory ? 'Hide History' : 'Show History'}
+          </Button>
+        </div>
+
+        {/* Conditional rendering of chat history */}
+        {showHistory && renderChatHistory()}
       </Drawer>
     </Grid>
   );

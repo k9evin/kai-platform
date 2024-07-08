@@ -62,7 +62,6 @@ const Chat = () => {
     const savedHistory = localStorage.getItem('chatHistory');
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
-
   // Handle sending a message and updating the history
   const handleSendMessage = () => {
     if (message.trim()) {
