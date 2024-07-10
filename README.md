@@ -67,8 +67,9 @@ To set up the project, follow these steps:
 
 ### Local Emulator (Optional)
 #### Setup
-1. Open the terminal and to start the emulators, run the following command: `npm run emulators`
-2. Open another terminal simultaneously and start the frontend project, run the following command: `npm run frontend:dev`
+1. Install Java
+2. Open the terminal and to start the emulators, run the following command: `npm run emulators`
+3. Open another terminal simultaneously and start the frontend project, run the following command: `npm run frontend:dev`
 
 ## Cloud Deployment
 1. Clone the repository: `git clone https://github.com/radicalxdev/kai-platform`
