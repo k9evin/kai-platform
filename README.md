@@ -67,7 +67,7 @@ To set up the project, follow these steps:
 
 ### Local Emulator (Optional)
 #### Setup
-1. Install Java
+1. Install Java v11 or higher, MacOS make Oracle account and download ARM64 dmg installer from https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html
 2. Open the terminal and to start the emulators, run the following command: `npm run emulators`
 3. Open another terminal simultaneously and start the frontend project, run the following command: `npm run frontend:dev`
 
