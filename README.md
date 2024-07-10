@@ -65,7 +65,7 @@ To set up the project, follow these steps:
 2. Install dependencies: `npm install`
 3. Run for local testing: `npm run dev`
 
-### Local Emulator (Optional)
+### Local Emulator
 #### Setup
 1. Install Java v11 or higher, MacOS make Oracle account and download ARM64 dmg installer from https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html
 2. Open the terminal and to start the emulators, run the following command: `npm run emulators`
