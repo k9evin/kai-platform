@@ -51,8 +51,9 @@ To set up the project, follow these steps:
 2. Create your firebase project on google firebase console
 3. Create a firestore database instance
 4. Get firebase config from firebase project settings in firebase console and save it to .env (create in root of this project, see sample.env for refrence)
-5. Install Firebase CLI by running the following in terminal: `npm install -g firebase-tools`
-6. Login to firebase CLI by running the following command: `firebase login`.
+5. Update .firebaserc file in functions folder with respective project ID
+6. Install Firebase CLI by running the following in terminal: `npm install -g firebase-tools`
+7. Login to firebase CLI by running the following command: `firebase login`.
 
 ### Backend
 1. Navigate to back-end project directory: `cd functions`
