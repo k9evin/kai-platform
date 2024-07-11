@@ -16,7 +16,15 @@ import {
   Typography,
 } from '@mui/material';
 
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase authentication libraries
+
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -54,7 +62,7 @@ import createChatSession from '@/services/chatbot/createChatSession';
 import sendMessage from '@/services/chatbot/sendMessage';
 
 // Chat Component
-const Chat = () => {
+const Chat = ({ user }) => {
   // Local state for message input and chat history
   const [message, setMessage] = useState('');
   const [history, setHistory] = useState(() => {
@@ -63,17 +71,24 @@ const Chat = () => {
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
   // Handle sending a message and updating the history
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
       const newMessage = {
         id: history.length + 1,
         timestamp: new Date().toISOString(),
         message,
+        userId: user.uid, //  Add user ID for data validation and storage
       };
       const newHistory = [...history, newMessage];
       setHistory(newHistory);
       setMessage('');
       localStorage.setItem('chatHistory', JSON.stringify(newHistory)); // Save history to local storage
+      // Save chat message to Firestore
+      try {
+        await addDoc(collection(firestore, 'chats'), newMessage);
+      } catch (e) {
+        // console.error('Error adding document: ', e);
+      }
     }
   };
   const handleKeyPress = (e) => {
@@ -127,9 +142,22 @@ const ChatInterface = () => {
     streaming,
   } = useSelector((state) => state.chat);
   const { data: userData } = useSelector((state) => state.user);
+  const [user, setUser] = useState(null); // Local state for authenticated user
+  const auth = getAuth();
+
+  // Monitor authentication state
+  useEffect(() => {
+    onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        setUser(authUser); // Set authenticated user
+      } else {
+        // Redirect to login page or handle unauthenticated state
+        window.location.href = '/login'; // Example redirect
+      }
+    });
+  }, []);
 
   const sessionId = localStorage.getItem('sessionId');
-
   const currentSession = chat;
   const chatMessages = currentSession?.messages;
   const showNewMessageIndicator = !fullyScrolled && streamingDone;
@@ -411,7 +439,8 @@ const ChatInterface = () => {
       {renderCenterChatContent()}
       {renderCenterChatContentNoMessages()}
       {renderScrollToBottomButton()}
-      {Chat()}
+      {user && <Chat user={user} />}
+      {/* Pass authenticated user to Chat component */}
     </Grid>
   );
 };
