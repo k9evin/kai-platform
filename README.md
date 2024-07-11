@@ -51,8 +51,9 @@ To set up the project, follow these steps:
 2. Create your firebase project on google firebase console
 3. Create a firestore database instance
 4. Get firebase config from firebase project settings in firebase console and save it to .env (create in root of this project, see sample.env for refrence)
-5. Install Firebase CLI by running the following in terminal: `npm install -g firebase-tools`
-6. Login to firebase CLI by running the following command: `firebase login`.
+5. Update .firebaserc file in functions folder with respective project ID
+6. Install Firebase CLI by running the following in terminal: `npm install -g firebase-tools`
+7. Login to firebase CLI by running the following command: `firebase login`.
 
 ### Backend
 1. Navigate to back-end project directory: `cd functions`
@@ -64,10 +65,11 @@ To set up the project, follow these steps:
 2. Install dependencies: `npm install`
 3. Run for local testing: `npm run dev`
 
-### Local Emulator (Optional)
+### Local Emulator
 #### Setup
-1. Open the terminal and to start the emulators, run the following command: `npm run emulators`
-2. Open another terminal simultaneously and start the frontend project, run the following command: `npm run frontend:dev`
+1. Install Java v11 or higher, MacOS make Oracle account and download ARM64 dmg installer from https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html
+2. Open the terminal and to start the emulators, run the following command: `npm run emulators`
+3. Open another terminal simultaneously and start the frontend project, run the following command: `npm run frontend:dev`
 
 ## Cloud Deployment
 1. Clone the repository: `git clone https://github.com/radicalxdev/kai-platform`
