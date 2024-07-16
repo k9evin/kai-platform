@@ -1,11 +1,7 @@
 // Importing necessary libraries and components
 import React, { useEffect, useRef, useState } from 'react';
 
-import {
-  ArrowDownwardOutlined,
-  InfoOutlined,
-  Settings,
-} from '@mui/icons-material';
+import { ArrowDownwardOutlined, InfoOutlined } from '@mui/icons-material';
 
 import {
   Button,
@@ -47,7 +43,6 @@ import {
   setFullyScrolled,
   setInput, // Importing setInput action
   setMessages,
-  setMore,
   setOpenInfoChat, // Importing setOpenInfoChat action
   setSessionLoaded,
   setStreaming,
@@ -338,7 +333,10 @@ const ChatInterface = () => {
   // Handle key down events for sending a message
   const keyDownHandler = async (e) => {
     if (typing || !input || streaming) return;
-    if (e.keyCode === 13) handleSendMessage();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      await handleSendMessage();
+    }
   };
 
   // Attach keyDownHandler to document keydown event listener
@@ -353,19 +351,17 @@ const ChatInterface = () => {
   const renderMoreChat = () => {
     if (!more) return null;
     return (
-      <Grid {...styles.moreChat.moreChatProps}>
-        <Grid {...styles.moreChat.contentMoreChatProps}>
-          <Settings {...styles.moreChat.iconProps} />
-          <Typography {...styles.moreChat.titleProps}>Settings</Typography>
+      <Fade in timeout={300}>
+        <Grid item style={styles.moreChat}>
+          <IconButton
+            onClick={() => dispatch(setOpenInfoChat(true))}
+            size="small"
+          >
+            <InfoOutlined fontSize="small" />
+          </IconButton>
+          <Typography variant="body2">Information</Typography>
         </Grid>
-        <Grid
-          {...styles.moreChat.contentMoreChatProps}
-          onClick={() => dispatch(setOpenInfoChat())}
-        >
-          <InfoOutlined {...styles.moreChat.iconProps} />
-          <Typography {...styles.moreChat.titleProps}>Information</Typography>
-        </Grid>
-      </Grid>
+      </Fade>
     );
   };
 
@@ -376,37 +372,26 @@ const ChatInterface = () => {
       !infoChatOpened &&
       chatMessages?.length !== 0 &&
       !!chatMessages
-    )
+    ) {
       return (
-        <Grid
-          onClick={() => dispatch(setMore({ role: 'shutdown' }))}
-          {...styles.centerChat.centerChatGridProps}
+        <div
+          ref={messagesContainerRef}
+          onScroll={handleOnScroll}
+          style={styles.centerChatContent}
         >
-          <Grid
-            ref={messagesContainerRef}
-            onScroll={handleOnScroll}
-            {...styles.centerChat.messagesGridProps}
-          >
-            {chatMessages?.map(
-              (message, index) =>
-                message?.role !== MESSAGE_ROLE.SYSTEM && (
-                  <Message
-                    ref={messagesContainerRef}
-                    {...message}
-                    messagesLength={chatMessages?.length}
-                    messageNo={index + 1}
-                    onQuickReply={handleQuickReply}
-                    streaming={streaming}
-                    fullyScrolled={fullyScrolled}
-                    key={index}
-                  />
-                )
-            )}
-            {typing && <ChatSpinner />}
-          </Grid>
-        </Grid>
+          {chatMessages?.map((message, index) => (
+            <Message
+              key={`message-${index}`}
+              {...message}
+              onQuickReply={handleQuickReply}
+              streaming={streaming}
+              fullyScrolled={fullyScrolled}
+            />
+          ))}
+          {typing && <ChatSpinner />}
+        </div>
       );
-
+    }
     return null;
   };
 
@@ -419,17 +404,19 @@ const ChatInterface = () => {
 
   // Render the scroll to bottom button
   const renderScrollToBottomButton = () => {
-    if (showNewMessageIndicator)
+    if (showNewMessageIndicator) {
       return (
-        <Fade in={showNewMessageIndicator}>
+        <Fade in timeout={300}>
           <IconButton
-            {...styles.bottomChatContent.floatingButtonProps}
             onClick={handleScrollToBottom}
+            style={styles.scrollToBottomButton}
+            size="small"
           >
-            <ArrowDownwardOutlined />
+            <ArrowDownwardOutlined fontSize="small" />
           </IconButton>
         </Fade>
       );
+    }
     return null;
   };
 
