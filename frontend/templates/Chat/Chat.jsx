@@ -17,6 +17,8 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase 
 import {
   addDoc,
   collection,
+  deleteDoc,
+  getDocs,
   onSnapshot,
   query,
   where,
@@ -68,10 +70,12 @@ const Chat = ({ user }) => {
   // Handle sending a message and updating the history
   const handleSendMessage = async () => {
     if (message.trim()) {
+      const topic = message.split(' ')[0];
       const newMessage = {
         id: history.length + 1,
         timestamp: new Date().toISOString(),
         message,
+        topic,
         userId: user.uid, //  Add user ID for data validation and storage
       };
       const newHistory = [...history, newMessage];
@@ -92,14 +96,36 @@ const Chat = ({ user }) => {
     }
   };
   // Function to clear chat history
-  const handleClearHistory = () => {
-    setHistory([]); // Clear the history state
-    localStorage.removeItem('chatHistory'); // Remove history from local storage
+  const handleClearHistory = async (topic) => {
+    // Delete messages related to the topic from Firestore
+    try {
+      // Query to get all messages for the given topic
+      const q = query(
+        collection(firestore, 'chats'),
+        where('topic', '==', topic)
+      );
+      const snapshot = await getDocs(q);
+
+      // Delete each message document
+      const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+
+      // Update local state and localStorage
+      const updatedHistory = history.filter((msg) => msg.topic !== topic);
+      setHistory(updatedHistory);
+      localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
+    } catch (e) {
+      // console.error('Error deleting documents: ', e);
+    }
   };
   return (
     <div>
       {/* Displaying chat history */}
-      <ChatHistory history={history} onClearHistory={handleClearHistory} />
+      <ChatHistory
+        history={history}
+        onClearHistory={handleClearHistory}
+        setHistory={setHistory}
+      />
       {/* Text field for typing message */}
       <TextField
         value={message}

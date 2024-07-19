@@ -5,6 +5,7 @@ import MoreHoriz from '@mui/icons-material/MoreHoriz';
 
 import {
   Collapse,
+  Fade,
   IconButton,
   List,
   ListItem,
@@ -18,9 +19,9 @@ import {
 import PropTypes from 'prop-types';
 
 // ChatHistory component displays a list of chat messages.
-const ChatHistory = ({ history, onClearHistory }) => {
+const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
   const [openCategories, setOpenCategories] = useState({
     today: true,
     yesterday: false,
@@ -28,20 +29,23 @@ const ChatHistory = ({ history, onClearHistory }) => {
     other: false,
   });
 
-  const handleMenuOpen = (event, message) => {
+  const handleMenuOpen = (event, topic) => {
     setAnchorEl(event.currentTarget);
-    setSelectedMessage(message);
+    setSelectedTopic(topic);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedMessage(null);
+    setSelectedTopic(null);
   };
 
-  const handleDeleteMessage = () => {
-    const newHistory = history.filter((msg) => msg.id !== selectedMessage.id);
+  const handleDeleteTopicAndHistory = () => {
+    if (!selectedTopic) return;
+    onClearHistory(selectedTopic);
+
+    const newHistory = history.filter((msg) => msg.topic !== selectedTopic);
+    setHistory(newHistory);
     localStorage.setItem('chatHistory', JSON.stringify(newHistory));
-    onClearHistory();
     handleMenuClose();
   };
 
@@ -90,6 +94,73 @@ const ChatHistory = ({ history, onClearHistory }) => {
         return 'Older';
     }
   };
+  const generateTopics = (messages) => {
+    const topics = {};
+    messages.forEach((msg) => {
+      const topic = msg.message.split(' ')[0];
+      if (!topics[topic]) {
+        topics[topic] = [];
+      }
+      topics[topic].push(msg);
+    });
+    return topics;
+  };
+  const renderTopics = (messages) => {
+    const topics = generateTopics(messages);
+    return (
+      <>
+        {Object.keys(topics).map((topic) => (
+          <div key={topic}>
+            <ListItem button onClick={() => setSelectedTopic(topic)}>
+              <ListItemText primary={topic} style={{ color: 'black' }} />
+              <IconButton
+                onClick={(event) => handleMenuOpen(event, topic)}
+                style={{ color: 'black' }}
+              >
+                <MoreHoriz />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl) && selectedTopic === topic}
+                onClose={handleMenuClose}
+              >
+                <MenuItem
+                  onClick={handleDeleteTopicAndHistory}
+                  style={{ color: 'red' }}
+                >
+                  Delete
+                </MenuItem>
+              </Menu>
+            </ListItem>
+            <Collapse in={selectedTopic === topic} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Fade in={selectedTopic === topic} timeout={{ enter: 500 }}>
+                  <div>
+                    {topics[topic].map((message) => (
+                      <ListItem key={message.id}>
+                        <ListItemText
+                          primary={message.message}
+                          secondary={new Date(
+                            message.timestamp
+                          ).toLocaleString()}
+                          primaryTypographyProps={{
+                            style: { color: 'darkblue' },
+                          }}
+                          secondaryTypographyProps={{
+                            style: { color: 'darkblue' },
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </div>
+                </Fade>
+              </List>
+            </Collapse>
+          </div>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div
@@ -133,138 +204,10 @@ const ChatHistory = ({ history, onClearHistory }) => {
               unmountOnExit
             >
               <List component="div" disablePadding>
-                {category === 'today' &&
-                  today.map((message) => (
-                    <ListItem key={message.id}>
-                      <ListItemText
-                        primary={message.message}
-                        secondary={new Date(message.timestamp).toLocaleString()}
-                        primaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                        secondaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                      />
-                      <IconButton
-                        onClick={(event) => handleMenuOpen(event, message)}
-                        style={{ color: 'darkblue' }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem
-                          onClick={handleDeleteMessage}
-                          style={{ color: 'red' }}
-                        >
-                          Delete
-                        </MenuItem>
-                      </Menu>
-                    </ListItem>
-                  ))}
-                {category === 'yesterday' &&
-                  yesterday.map((message) => (
-                    <ListItem key={message.id}>
-                      <ListItemText
-                        primary={message.message}
-                        secondary={new Date(message.timestamp).toLocaleString()}
-                        primaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                        secondaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                      />
-                      <IconButton
-                        onClick={(event) => handleMenuOpen(event, message)}
-                        style={{ color: 'darkblue' }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem
-                          onClick={handleDeleteMessage}
-                          style={{ color: 'red' }}
-                        >
-                          Delete
-                        </MenuItem>
-                      </Menu>
-                    </ListItem>
-                  ))}
-                {category === 'twoDaysAgo' &&
-                  twoDaysAgo.map((message) => (
-                    <ListItem key={message.id}>
-                      <ListItemText
-                        primary={message.message}
-                        secondary={new Date(message.timestamp).toLocaleString()}
-                        primaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                        secondaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                      />
-                      <IconButton
-                        onClick={(event) => handleMenuOpen(event, message)}
-                        style={{ color: 'darkblue' }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem
-                          onClick={handleDeleteMessage}
-                          style={{ color: 'red' }}
-                        >
-                          Delete
-                        </MenuItem>
-                      </Menu>
-                    </ListItem>
-                  ))}
-                {category === 'other' &&
-                  other.map((message) => (
-                    <ListItem key={message.id}>
-                      <ListItemText
-                        primary={message.message}
-                        secondary={new Date(message.timestamp).toLocaleString()}
-                        primaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                        secondaryTypographyProps={{
-                          style: { color: 'darkblue' },
-                        }}
-                      />
-                      <IconButton
-                        onClick={(event) => handleMenuOpen(event, message)}
-                        style={{ color: 'darkblue' }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem
-                          onClick={handleDeleteMessage}
-                          style={{ color: 'red' }}
-                        >
-                          Delete
-                        </MenuItem>
-                      </Menu>
-                    </ListItem>
-                  ))}
+                {category === 'today' && renderTopics(today)}
+                {category === 'yesterday' && renderTopics(yesterday)}
+                {category === 'twoDaysAgo' && renderTopics(twoDaysAgo)}
+                {category === 'other' && renderTopics(other)}
               </List>
             </Collapse>
           </div>
@@ -281,9 +224,11 @@ ChatHistory.propTypes = {
       id: PropTypes.number.isRequired,
       timestamp: PropTypes.string.isRequired,
       message: PropTypes.string.isRequired,
+      topic: PropTypes.string.isRequired,
     })
   ).isRequired,
   onClearHistory: PropTypes.func.isRequired,
+  setHistory: PropTypes.func.isRequired,
 };
 
 export default ChatHistory;
