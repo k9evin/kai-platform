@@ -1,5 +1,4 @@
 import { ThemeProvider } from '@emotion/react';
-
 import { useRouter } from 'next/router';
 import { GoogleAnalytics } from 'nextjs-google-analytics';
 

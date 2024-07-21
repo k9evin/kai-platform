@@ -52,6 +52,7 @@
     "remark-gfm": "^4.0.0",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
+    "styled-components": "^6.1.12",
     "unified": "^11.0.2"
   },
   "devDependencies": {
@@ -60,7 +61,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "12.3.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",

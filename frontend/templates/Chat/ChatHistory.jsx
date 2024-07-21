@@ -17,17 +17,44 @@ import {
 
 // Ensure PropTypes is imported from the correct package
 import PropTypes from 'prop-types';
+import styled, { keyframes } from 'styled-components';
+
+const typingAnimation = keyframes`
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+`;
+
+const blinkCaret = keyframes`
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: darkblue;
+  }
+`;
+
+const TypingAnimation = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  white-space: normal; // Allow text to wrap onto the next line
+  animation: ${typingAnimation} 2s steps(40, end),
+    ${blinkCaret} 0.75s step-end infinite;
+  border-right: 4px solid; /* Cursor */
+  word-wrap: break-word; // Allow long words to break onto the next line
+  width: auto; // Remove fixed width to allow wrapping
+`;
 
 // ChatHistory component displays a list of chat messages.
 const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [openCategories, setOpenCategories] = useState({
-    today: true,
-    yesterday: false,
-    twoDaysAgo: false,
-    other: false,
-  });
+  const [expandedTopics, setExpandedTopics] = useState({});
+  const [displayedMessages, setDisplayedMessages] = useState({});
 
   const handleMenuOpen = (event, topic) => {
     setAnchorEl(event.currentTarget);
@@ -52,8 +79,7 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const categorizeHistory = () => {
     const today = [];
     const yesterday = [];
-    const twoDaysAgo = [];
-    const other = [];
+    const older = [];
 
     const now = new Date();
     const todayStart = new Date(
@@ -62,7 +88,6 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
       now.getDate()
     ).getTime();
     const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
-    const twoDaysAgoStart = yesterdayStart - 24 * 60 * 60 * 1000;
 
     history.forEach((message) => {
       const messageTime = new Date(message.timestamp).getTime();
@@ -70,30 +95,16 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
         today.push(message);
       } else if (messageTime >= yesterdayStart) {
         yesterday.push(message);
-      } else if (messageTime >= twoDaysAgoStart) {
-        twoDaysAgo.push(message);
       } else {
-        other.push(message);
+        older.push(message);
       }
     });
 
-    return { today, yesterday, twoDaysAgo, other };
+    return { today, yesterday, older };
   };
 
-  const { today, yesterday, twoDaysAgo, other } = categorizeHistory(history);
+  const { today, yesterday, older } = categorizeHistory(history);
 
-  const getCategoryText = (category) => {
-    switch (category) {
-      case 'today':
-        return 'Today';
-      case 'yesterday':
-        return 'Yesterday';
-      case 'twoDaysAgo':
-        return 'Two Days Ago';
-      default:
-        return 'Older';
-    }
-  };
   const generateTopics = (messages) => {
     const topics = {};
     messages.forEach((msg) => {
@@ -105,13 +116,33 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     });
     return topics;
   };
+  const toggleTopic = (topic) => {
+    setExpandedTopics((prev) => ({
+      ...prev,
+      [topic]: !prev[topic],
+    }));
+    if (!expandedTopics[topic]) {
+      // Simulate typing effect
+      const messages = generateTopics(history)[topic];
+      let index = 0;
+      const interval = setInterval(() => {
+        setDisplayedMessages((prev) => ({
+          ...prev,
+          [topic]: messages.slice(0, index + 1),
+        }));
+        index += 1;
+        if (index >= messages.length) clearInterval(interval);
+      }, 200); // Adjust typing speed as needed
+    }
+  };
+
   const renderTopics = (messages) => {
     const topics = generateTopics(messages);
     return (
       <>
         {Object.keys(topics).map((topic) => (
           <div key={topic}>
-            <ListItem button onClick={() => setSelectedTopic(topic)}>
+            <ListItem button onClick={() => toggleTopic(topic)}>
               <ListItemText primary={topic} style={{ color: 'black' }} />
               <IconButton
                 onClick={(event) => handleMenuOpen(event, topic)}
@@ -132,26 +163,31 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
                 </MenuItem>
               </Menu>
             </ListItem>
-            <Collapse in={selectedTopic === topic} timeout="auto" unmountOnExit>
+            <Collapse in={expandedTopics[topic]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <Fade in={selectedTopic === topic} timeout={{ enter: 500 }}>
+                <Fade in={expandedTopics[topic]} timeout={{ enter: 500 }}>
                   <div>
-                    {topics[topic].map((message) => (
-                      <ListItem key={message.id}>
-                        <ListItemText
-                          primary={message.message}
-                          secondary={new Date(
-                            message.timestamp
-                          ).toLocaleString()}
-                          primaryTypographyProps={{
-                            style: { color: 'darkblue' },
-                          }}
-                          secondaryTypographyProps={{
-                            style: { color: 'darkblue' },
-                          }}
-                        />
-                      </ListItem>
-                    ))}
+                    {displayedMessages[topic] &&
+                      displayedMessages[topic].map((message) => (
+                        <ListItem key={message.id}>
+                          <ListItemText
+                            primary={
+                              <TypingAnimation>
+                                {message.message}
+                              </TypingAnimation>
+                            }
+                            secondary={new Date(
+                              message.timestamp
+                            ).toLocaleString()}
+                            primaryTypographyProps={{
+                              style: { color: 'darkblue' },
+                            }}
+                            secondaryTypographyProps={{
+                              style: { color: 'darkblue' },
+                            }}
+                          />
+                        </ListItem>
+                      ))}
                   </div>
                 </Fade>
               </List>
@@ -182,34 +218,17 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
       </Typography>
 
       <List>
-        {['today', 'yesterday', 'twoDaysAgo', 'other'].map((category) => (
+        {['today', 'yesterday', 'older'].map((category) => (
           <div key={category}>
-            <ListItem
-              button
-              onClick={() =>
-                setOpenCategories((prev) => ({
-                  ...prev,
-                  [category]: !prev[category],
-                }))
-              }
-            >
-              <ListItemText
-                primary={getCategoryText(category)}
-                style={{ color: 'gray' }}
-              />
-            </ListItem>
-            <Collapse
-              in={openCategories[category]}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List component="div" disablePadding>
-                {category === 'today' && renderTopics(today)}
-                {category === 'yesterday' && renderTopics(yesterday)}
-                {category === 'twoDaysAgo' && renderTopics(twoDaysAgo)}
-                {category === 'other' && renderTopics(other)}
-              </List>
-            </Collapse>
+            <ListItemText
+              primary={category.charAt(0).toUpperCase() + category.slice(1)}
+              style={{ color: 'gray' }}
+            />
+            <List component="div" disablePadding>
+              {category === 'today' && renderTopics(today)}
+              {category === 'yesterday' && renderTopics(yesterday)}
+              {category === 'older' && renderTopics(older)}
+            </List>
           </div>
         ))}
       </List>
