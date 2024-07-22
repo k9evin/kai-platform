@@ -56,14 +56,12 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const [expandedTopics, setExpandedTopics] = useState({});
   const [displayedMessages, setDisplayedMessages] = useState({});
 
-  const handleMenuOpen = (event, topic) => {
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    setSelectedTopic(topic);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedTopic(null);
   };
 
   const handleDeleteTopicAndHistory = () => {
@@ -74,6 +72,7 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     setHistory(newHistory);
     localStorage.setItem('chatHistory', JSON.stringify(newHistory));
     handleMenuClose();
+    setSelectedTopic(null);
   };
 
   const categorizeHistory = () => {
@@ -117,6 +116,15 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     return topics;
   };
   const toggleTopic = (topic) => {
+    if (selectedTopic === topic) {
+      setSelectedTopic(null); // Deselect if clicking the same topic
+      setDisplayedMessages([]); // Clear messages when deselected
+    } else {
+      setSelectedTopic(topic); // Select new topic
+      const messages = generateTopics(history)[topic];
+      setDisplayedMessages(messages);
+    }
+
     setExpandedTopics((prev) => ({
       ...prev,
       [topic]: !prev[topic],
@@ -142,26 +150,19 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
       <>
         {Object.keys(topics).map((topic) => (
           <div key={topic}>
-            <ListItem button onClick={() => toggleTopic(topic)}>
+            <ListItem
+              button
+              onClick={() => toggleTopic(topic)}
+              style={{
+                backgroundColor:
+                  selectedTopic === topic
+                    ? 'rgba(128, 0, 128, 0.1)'
+                    : 'transparent',
+                borderLeft:
+                  selectedTopic === topic ? '4px solid purple' : 'none',
+              }}
+            >
               <ListItemText primary={topic} style={{ color: 'black' }} />
-              <IconButton
-                onClick={(event) => handleMenuOpen(event, topic)}
-                style={{ color: 'black' }}
-              >
-                <MoreHoriz />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl) && selectedTopic === topic}
-                onClose={handleMenuClose}
-              >
-                <MenuItem
-                  onClick={handleDeleteTopicAndHistory}
-                  style={{ color: 'red' }}
-                >
-                  Delete
-                </MenuItem>
-              </Menu>
             </ListItem>
             <Collapse in={expandedTopics[topic]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
@@ -213,24 +214,56 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
         height: '110%', // Adjust height as needed
       }}
     >
+      <div
+        style={{
+          display: 'flex ',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      />
       <Typography variant="h6" style={{ color: 'Black' }}>
         Chat History
       </Typography>
-
+      <IconButton onClick={handleMenuOpen} style={{ color: 'black' }}>
+        <MoreHoriz />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem
+          onClick={handleDeleteTopicAndHistory}
+          style={{ color: 'red' }}
+        >
+          Delete Topic
+        </MenuItem>
+      </Menu>
       <List>
-        {['today', 'yesterday', 'older'].map((category) => (
-          <div key={category}>
-            <ListItemText
-              primary={category.charAt(0).toUpperCase() + category.slice(1)}
-              style={{ color: 'gray' }}
-            />
+        {today.length > 0 && (
+          <div>
+            <ListItemText primary="Today" style={{ color: 'gray' }} />
             <List component="div" disablePadding>
-              {category === 'today' && renderTopics(today)}
-              {category === 'yesterday' && renderTopics(yesterday)}
-              {category === 'older' && renderTopics(older)}
+              {renderTopics(today)}
             </List>
           </div>
-        ))}
+        )}
+        {yesterday.length > 0 && (
+          <div>
+            <ListItemText primary="Yesterday" style={{ color: 'gray' }} />
+            <List component="div" disablePadding>
+              {renderTopics(yesterday)}
+            </List>
+          </div>
+        )}
+        {older.length > 0 && (
+          <div>
+            <ListItemText primary="Older" style={{ color: 'gray' }} />
+            <List component="div" disablePadding>
+              {renderTopics(older)}
+            </List>
+          </div>
+        )}
       </List>
     </div>
   );
