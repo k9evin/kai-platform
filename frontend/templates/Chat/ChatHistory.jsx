@@ -154,15 +154,14 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
               button
               onClick={() => toggleTopic(topic)}
               style={{
-                backgroundColor:
-                  selectedTopic === topic
-                    ? 'rgba(128, 0, 128, 0.1)'
-                    : 'transparent',
                 borderLeft:
-                  selectedTopic === topic ? '4px solid purple' : 'none',
+                  selectedTopic === topic ? 'rgba(122, 16, 238, 0.8)' : 'none',
               }}
             >
-              <ListItemText primary={topic} style={{ color: 'black' }} />
+              <ListItemText
+                primary={topic}
+                style={{ color: selectedTopic === topic ? '#c363fc' : 'white' }}
+              />
             </ListItem>
             <Collapse in={expandedTopics[topic]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
@@ -181,10 +180,10 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
                               message.timestamp
                             ).toLocaleString()}
                             primaryTypographyProps={{
-                              style: { color: 'darkblue' },
+                              style: { color: '#8080ff' },
                             }}
                             secondaryTypographyProps={{
-                              style: { color: 'darkblue' },
+                              style: { color: '#8080ff' },
                             }}
                           />
                         </ListItem>
@@ -202,13 +201,13 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   return (
     <div
       style={{
-        border: '1px solid #ccc',
+        border: '2px solid blue',
         padding: '10px',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#242424',
         maxWidth: '300px',
         position: 'fixed', // Fix position
         right: '0', // Align to the right
-        top: '0.4%', // Adjust top position as needed
+        top: '0.1%', // Adjust top position as needed
         zIndex: 1000, // Ensure it is above other elements
         overflowY: 'auto', // Ensure overflow is handled
         height: '110%', // Adjust height as needed
@@ -219,14 +218,45 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
           display: 'flex ',
           justifyContent: 'space-between',
           alignItems: 'center',
+          marginBottom: '10px', // Space between heading and list
         }}
-      />
-      <Typography variant="h6" style={{ color: 'Black' }}>
-        Chat History
-      </Typography>
-      <IconButton onClick={handleMenuOpen} style={{ color: 'black' }}>
-        <MoreHoriz />
-      </IconButton>
+      >
+        <Typography variant="h6" style={{ color: 'white' }}>
+          Chat History
+        </Typography>
+        <IconButton
+          onClick={handleMenuOpen}
+          style={{ color: 'blue', width: '100px', height: '100px' }}
+        >
+          <MoreHoriz />
+        </IconButton>
+      </div>
+      <List>
+        {today.length > 0 && (
+          <div>
+            <ListItemText primary="Today" style={{ color: '#808080' }} />
+            <List component="div" disablePadding>
+              {renderTopics(today)}
+            </List>
+          </div>
+        )}
+        {yesterday.length > 0 && (
+          <div>
+            <ListItemText primary="Yesterday" style={{ color: '#808080' }} />
+            <List component="div" disablePadding>
+              {renderTopics(yesterday)}
+            </List>
+          </div>
+        )}
+        {older.length > 0 && (
+          <div>
+            <ListItemText primary="Older" style={{ color: '#808080' }} />
+            <List component="div" disablePadding>
+              {renderTopics(older)}
+            </List>
+          </div>
+        )}
+      </List>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -239,32 +269,6 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
           Delete Topic
         </MenuItem>
       </Menu>
-      <List>
-        {today.length > 0 && (
-          <div>
-            <ListItemText primary="Today" style={{ color: 'gray' }} />
-            <List component="div" disablePadding>
-              {renderTopics(today)}
-            </List>
-          </div>
-        )}
-        {yesterday.length > 0 && (
-          <div>
-            <ListItemText primary="Yesterday" style={{ color: 'gray' }} />
-            <List component="div" disablePadding>
-              {renderTopics(yesterday)}
-            </List>
-          </div>
-        )}
-        {older.length > 0 && (
-          <div>
-            <ListItemText primary="Older" style={{ color: 'gray' }} />
-            <List component="div" disablePadding>
-              {renderTopics(older)}
-            </List>
-          </div>
-        )}
-      </List>
     </div>
   );
 };
