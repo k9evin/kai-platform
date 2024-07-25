@@ -207,7 +207,7 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
         maxWidth: '300px',
         position: 'fixed', // Fix position
         right: '0', // Align to the right
-        top: '0.1%', // Adjust top position as needed
+        top: '0%', // Adjust top position as needed
         zIndex: 1000, // Ensure it is above other elements
         overflowY: 'auto', // Ensure overflow is handled
         height: '110%', // Adjust height as needed
@@ -226,11 +226,13 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
         </Typography>
         <IconButton
           onClick={handleMenuOpen}
-          style={{ color: 'blue', width: '100px', height: '100px' }}
+          style={{ color: 'blue', width: '30px', height: '30px' }}
         >
           <MoreHoriz />
         </IconButton>
       </div>
+      <hr style={{ border: '1px solid blue', width: '100%' }} />
+      {/* Line below chat history and button */}
       <List>
         {today.length > 0 && (
           <div>
