@@ -1,12 +1,20 @@
+import React, { useEffect, useState } from 'react';
+
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
+import SearchIcon from '@mui/icons-material/Search';
+
 import {
   Button,
   Divider,
   Drawer,
   Grid,
+  InputAdornment,
   List,
   ListItem,
+  TextField,
   Typography,
 } from '@mui/material';
 
@@ -21,35 +29,43 @@ const HistoryDrawer = (props) => {
     toggleShowHistory,
     history,
     clearHistory,
+    selectedTopic,
+    setSelectedTopic,
   } = props;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredTopics, setFilteredTopics] = useState([]);
 
-  const defaultData = {
-    createdData: new Date().toLocaleDateString(),
-    title: 'Video Comprehension Questions',
-    description: 'Generate guiding questions aligned to a Youtube video on UX',
-    questions: [
-      {
-        question: '1. Default Question?',
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        answer: 'Option A',
-      },
-    ],
+  useEffect(() => {
+    setFilteredTopics(
+      history
+        .map((item) => item.topic)
+        .filter((topic) =>
+          topic.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+  }, [searchTerm, history]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
-  const { createdData, title, description, questions } = defaultData;
+  const handleTopicClick = (topic) => {
+    console.log('Clicked topic:', topic);
+    setSelectedTopic(topic);
+  };
 
   const renderHeader = () => {
     return (
       <Grid {...styles.headerGridProps}>
-        <Typography {...styles.dateProps}>{createdData}</Typography>
-        <Typography {...styles.titleProps}>{title}</Typography>
-        <Typography {...styles.descriptionProps}>{description}</Typography>
+        <Typography {...styles.dateProps}>{data.createdDate}</Typography>
+        <Typography {...styles.titleProps}>{data.title}</Typography>
+        <Typography {...styles.descriptionProps}>{data.description}</Typography>
       </Grid>
     );
   };
 
-  const renderQuestions = () => {
-    return questions.map((question, index) => (
+  const renderQuestions = () =>
+    data.questions.map((question, index) => (
       <div key={index}>
         <ListItem {...styles.listItemProps}>
           <Typography {...styles.questionProps}>{question.question}</Typography>
@@ -63,11 +79,9 @@ const HistoryDrawer = (props) => {
           <Typography {...styles.answerTextProps}>Answer Key</Typography>
           <Typography {...styles.answerKeyProps}>{question.answer}</Typography>
         </ListItem>
-        {index < questions.length - 1 && <Divider />}
-        {/* Add Divider here if needed */}
+        {index < data.questions.length - 1 && <Divider />}
       </div>
     ));
-  };
 
   const handleCopyToClipboard = () => {
     const text = JSON.stringify(data, null, 2); // Format the JSON for readability
@@ -120,24 +134,74 @@ const HistoryDrawer = (props) => {
       <Typography variant="h6" style={{ color: '#1E88E5' }}>
         Chat History
       </Typography>
-      <div>
-        {history.map((item) => (
-          <div key={item.id}>
+      <TextField
+        variant="outlined"
+        size="small"
+        placeholder="Search your topic"
+        value={searchTerm}
+        onChange={handleSearchChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+          style: {
+            border: '1px solid black', // Ensure the border is black
+            borderRadius: '4px',
+            height: '30px', // Adjust the height of the input
+            color: 'black',
+          },
+        }}
+        style={{ marginBottom: '10px', width: '100%' }}
+      />
+      <List>
+        {filteredTopics.map((topic, index) => (
+          <ListItem key={index} button onClick={() => handleTopicClick(topic)}>
             <Typography variant="body2" style={{ color: '#1E88E5' }}>
-              {item.message}
+              {topic}
             </Typography>
-            <Typography variant="caption" style={{ color: '#1E88E5' }}>
-              {new Date(item.timestamp).toLocaleString()}
-            </Typography>
-            <hr />
-          </div>
+          </ListItem>
         ))}
-      </div>
+      </List>
       <Button onClick={clearHistory} variant="contained" color="secondary">
         Clear History
       </Button>
     </div>
   );
+
+  const renderSelectedMessages = () => {
+    if (!selectedTopic) return null;
+    const topicData = history.find((item) => item.topic === selectedTopic);
+    console.log('Topic Data:', topicData);
+    if (!topicData)
+      return <Typography>No messages found for this topic.</Typography>;
+    const { messages } = topicData;
+
+    return (
+      <div>
+        <List>
+          {messages.map((message, index) => (
+            <ListItem key={index}>
+              <Typography variant="body2" style={{ color: '#1E88E5' }}>
+                {message}
+              </Typography>
+            </ListItem>
+          ))}
+        </List>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    if (showHistory) {
+      if (selectedTopic) {
+        return renderSelectedMessages();
+      }
+      return renderChatHistory();
+    }
+    return null; // or any fallback content when history is not shown
+  };
 
   return (
     <Grid {...styles.mainGridProps}>
@@ -159,9 +223,7 @@ const HistoryDrawer = (props) => {
             {showHistory ? 'Hide History' : 'Show History'}
           </Button>
         </div>
-
-        {/* Conditional rendering of chat history */}
-        {showHistory && renderChatHistory()}
+        {renderContent()}
       </Drawer>
     </Grid>
   );

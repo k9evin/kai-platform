@@ -1,5 +1,5 @@
 // ChatHistory.jsx
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 
@@ -73,9 +73,10 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     localStorage.setItem('chatHistory', JSON.stringify(newHistory));
     handleMenuClose();
     setSelectedTopic(null);
+    setDisplayedMessages({});
   };
 
-  const categorizeHistory = () => {
+  const categorizeHistory = useCallback(() => {
     const today = [];
     const yesterday = [];
     const older = [];
@@ -100,29 +101,115 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     });
 
     return { today, yesterday, older };
-  };
+  }, [history]);
 
   const { today, yesterday, older } = categorizeHistory(history);
 
-  const generateTopics = (messages) => {
-    const topics = {};
-    messages.forEach((msg) => {
-      const topic = msg.message.split(' ')[0];
-      if (!topics[topic]) {
-        topics[topic] = [];
-      }
-      topics[topic].push(msg);
-    });
-    return topics;
-  };
+  const generateTopics = useCallback(
+    (messages) => {
+      const topics = {};
+      const stopWords = new Set([
+        'is',
+        'a',
+        'an',
+        'the',
+        'and',
+        'or',
+        'of',
+        'to',
+        'in',
+        'on',
+        'with',
+        'for',
+        'by',
+        'as',
+        'at',
+        'from',
+        'about',
+        'it',
+        'this',
+        'that',
+        'these',
+        'those',
+        'you',
+        'we',
+        'they',
+        'he',
+        'she',
+        'i',
+        'me',
+        'my',
+        'mine',
+        'us',
+        'our',
+        'ours',
+        'your',
+        'yours',
+        'their',
+        'theirs',
+        'his',
+        'her',
+        'its',
+        'just',
+      ]);
+      const minTopicLength = 4; // Minimum length of a topic word
+      messages.forEach((msg) => {
+        const words = msg.message
+          .split(' ')
+          .filter(
+            (word) =>
+              !stopWords.has(word.toLowerCase()) &&
+              word.length >= minTopicLength
+          )
+          .map((word) => word.toLowerCase());
+        if (words.length === 0) return;
+
+        // Count word occurrences and determine the most frequent word
+        const wordCount = {};
+        let topic = [words[0]];
+        let maxCount = 1;
+
+        words.forEach((word) => {
+          wordCount[word] = (wordCount[word] || 0) + 1;
+          if (wordCount[word] > maxCount) {
+            maxCount = wordCount[word];
+            topic = word;
+          }
+        });
+        if (!topics[topic]) {
+          topics[topic] = [];
+        }
+        topics[topic].push(msg);
+      });
+      // Combine similar topics (e.g., "school" and "schoolwork" might be combined)
+      const combinedTopics = {};
+      Object.keys(topics).forEach((topic) => {
+        const combinedTopic = Object.keys(combinedTopics).find(
+          (existingTopic) =>
+            existingTopic.includes(topic) || topic.includes(existingTopic)
+        );
+        if (combinedTopic) {
+          combinedTopics[combinedTopic] = [
+            ...combinedTopics[combinedTopic],
+            ...topics[topic],
+          ];
+        } else {
+          combinedTopics[topic] = topics[topic];
+        }
+      });
+
+      return combinedTopics;
+    },
+    [history]
+  );
   const toggleTopic = (topic) => {
     if (selectedTopic === topic) {
       setSelectedTopic(null); // Deselect if clicking the same topic
       setDisplayedMessages([]); // Clear messages when deselected
     } else {
       setSelectedTopic(topic); // Select new topic
-      const messages = generateTopics(history)[topic];
-      setDisplayedMessages(messages);
+      const messages = generateTopics(history)[topic] || [];
+      setDisplayedMessages({ [topic]: messages });
     }
 
     setExpandedTopics((prev) => ({
@@ -131,7 +218,7 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
     }));
     if (!expandedTopics[topic]) {
       // Simulate typing effect
-      const messages = generateTopics(history)[topic];
+      const messages = generateTopics(history)[topic] || [];
       let index = 0;
       const interval = setInterval(() => {
         setDisplayedMessages((prev) => ({

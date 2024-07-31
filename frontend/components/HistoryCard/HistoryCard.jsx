@@ -17,6 +17,7 @@ const HistoryCard = (props) => {
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState(null);
 
   const defaultData = {
     createdData: new Date().toLocaleDateString(),
@@ -75,6 +76,8 @@ const HistoryCard = (props) => {
         showHistory={showHistory}
         toggleShowHistory={toggleShowHistory}
         history={history}
+        selectedTopic={selectedTopic}
+        setSelectedTopic={setSelectedTopic}
         clearHistory={() => {
           setHistory([]);
           localStorage.removeItem('chatHistory');
