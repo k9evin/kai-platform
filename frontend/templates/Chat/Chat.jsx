@@ -28,6 +28,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { MESSAGE_ROLE, MESSAGE_TYPES } from '@/constants/bots';
 
+import QuickActions from '../../components/QuickActions/QuickActions.jsx';
+
 import CenterChatContentNoMessages from './CenterChatContentNoMessages';
 
 import ChatHistory from './ChatHistory'; // Added component import underneath the CenterChat import
@@ -35,8 +37,6 @@ import ChatHistory from './ChatHistory'; // Added component import underneath th
 import ChatSpinner from './ChatSpinner';
 
 import Message from './Message';
-
-import QuickActions from '../../components/QuickActions/QuickActions.jsx';
 
 import styles from './styles';
 

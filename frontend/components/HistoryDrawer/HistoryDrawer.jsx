@@ -50,7 +50,7 @@ const HistoryDrawer = (props) => {
   };
 
   const handleTopicClick = (topic) => {
-    console.log('Clicked topic:', topic);
+    // console.log('Clicked topic:', topic);
     setSelectedTopic(topic);
   };
 
