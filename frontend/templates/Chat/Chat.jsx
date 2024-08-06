@@ -36,6 +36,8 @@ import ChatSpinner from './ChatSpinner';
 
 import Message from './Message';
 
+import QuickActions from '../../components/QuickActions/QuickActions.jsx';
+
 import styles from './styles';
 
 import {
@@ -95,6 +97,22 @@ const Chat = ({ user }) => {
       handleSendMessage();
     }
   };
+
+  // Handle quick actions
+  const handleQuickAction = (action) => {
+    switch (action) {
+      case 'suggest_techniques':
+        setMessage('Can you suggest some learning techniques?');
+        break;
+      case 'recommend_books':
+        setMessage('Can you recommend some books?');
+        break;
+      // Add more cases for other quick actions
+      default:
+        break;
+    }
+  };
+
   // Function to clear chat history
   const handleClearHistory = async (topic) => {
     // Delete messages related to the topic from Firestore
@@ -120,6 +138,8 @@ const Chat = ({ user }) => {
   };
   return (
     <div>
+      {/* Quick Action Buttons */}
+      <QuickActions onAction={handleQuickAction} />
       {/* Displaying chat history */}
       <ChatHistory
         history={history}

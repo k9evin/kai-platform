@@ -1,5 +1,5 @@
 // ChatHistory.jsx
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 
@@ -55,6 +55,14 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [expandedTopics, setExpandedTopics] = useState({});
   const [displayedMessages, setDisplayedMessages] = useState({});
+  useEffect(() => {
+    // Cleanup effect to reset topics on component unmount or history change
+    return () => {
+      setSelectedTopic(null);
+      setDisplayedMessages({});
+      setExpandedTopics({});
+    };
+  }, [history]);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -66,14 +74,22 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
 
   const handleDeleteTopicAndHistory = () => {
     if (!selectedTopic) return;
+
     onClearHistory(selectedTopic);
 
-    const newHistory = history.filter((msg) => msg.topic !== selectedTopic);
+    const normalizedTopic = selectedTopic.toLowerCase();
+    const newHistory = history.filter(
+      (msg) => msg.topic.toLowerCase() !== normalizedTopic
+    );
     setHistory(newHistory);
     localStorage.setItem('chatHistory', JSON.stringify(newHistory));
     handleMenuClose();
     setSelectedTopic(null);
     setDisplayedMessages({});
+    setExpandedTopics((prev) => ({
+      ...prev,
+      [selectedTopic]: false,
+    }));
   };
 
   const categorizeHistory = useCallback(() => {
@@ -181,31 +197,15 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
         }
         topics[topic].push(msg);
       });
-      // Combine similar topics (e.g., "school" and "schoolwork" might be combined)
-      const combinedTopics = {};
-      Object.keys(topics).forEach((topic) => {
-        const combinedTopic = Object.keys(combinedTopics).find(
-          (existingTopic) =>
-            existingTopic.includes(topic) || topic.includes(existingTopic)
-        );
-        if (combinedTopic) {
-          combinedTopics[combinedTopic] = [
-            ...combinedTopics[combinedTopic],
-            ...topics[topic],
-          ];
-        } else {
-          combinedTopics[topic] = topics[topic];
-        }
-      });
-
-      return combinedTopics;
+      return topics;
     },
     [history]
   );
+
   const toggleTopic = (topic) => {
     if (selectedTopic === topic) {
       setSelectedTopic(null); // Deselect if clicking the same topic
-      setDisplayedMessages([]); // Clear messages when deselected
+      setDisplayedMessages({}); // Clear messages when deselected
     } else {
       setSelectedTopic(topic); // Select new topic
       const messages = generateTopics(history)[topic] || [];
