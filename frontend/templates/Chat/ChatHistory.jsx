@@ -50,7 +50,7 @@ const TypingAnimation = styled.span`
 `;
 
 // ChatHistory component displays a list of chat messages.
-const ChatHistory = ({ history, onClearHistory, setHistory }) => {
+const ChatHistory = ({ history, setHistory }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [expandedTopics, setExpandedTopics] = useState({});
@@ -75,12 +75,12 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const handleDeleteTopicAndHistory = () => {
     if (!selectedTopic) return;
 
-    onClearHistory(selectedTopic);
-
     const normalizedTopic = selectedTopic.toLowerCase();
+
     const newHistory = history.filter(
       (msg) => msg.topic.toLowerCase() !== normalizedTopic
     );
+
     setHistory(newHistory);
     localStorage.setItem('chatHistory', JSON.stringify(newHistory));
     handleMenuClose();
@@ -124,74 +124,8 @@ const ChatHistory = ({ history, onClearHistory, setHistory }) => {
   const generateTopics = useCallback(
     (messages) => {
       const topics = {};
-      const stopWords = new Set([
-        'is',
-        'a',
-        'an',
-        'the',
-        'and',
-        'or',
-        'of',
-        'to',
-        'in',
-        'on',
-        'with',
-        'for',
-        'by',
-        'as',
-        'at',
-        'from',
-        'about',
-        'it',
-        'this',
-        'that',
-        'these',
-        'those',
-        'you',
-        'we',
-        'they',
-        'he',
-        'she',
-        'i',
-        'me',
-        'my',
-        'mine',
-        'us',
-        'our',
-        'ours',
-        'your',
-        'yours',
-        'their',
-        'theirs',
-        'his',
-        'her',
-        'its',
-        'just',
-      ]);
-      const minTopicLength = 4; // Minimum length of a topic word
       messages.forEach((msg) => {
-        const words = msg.message
-          .split(' ')
-          .filter(
-            (word) =>
-              !stopWords.has(word.toLowerCase()) &&
-              word.length >= minTopicLength
-          )
-          .map((word) => word.toLowerCase());
-        if (words.length === 0) return;
-
-        // Count word occurrences and determine the most frequent word
-        const wordCount = {};
-        let topic = [words[0]];
-        let maxCount = 1;
-
-        words.forEach((word) => {
-          wordCount[word] = (wordCount[word] || 0) + 1;
-          if (wordCount[word] > maxCount) {
-            maxCount = wordCount[word];
-            topic = word;
-          }
-        });
+        const topic = msg.topic.toLowerCase();
         if (!topics[topic]) {
           topics[topic] = [];
         }
@@ -372,7 +306,6 @@ ChatHistory.propTypes = {
       topic: PropTypes.string.isRequired,
     })
   ).isRequired,
-  onClearHistory: PropTypes.func.isRequired,
   setHistory: PropTypes.func.isRequired,
 };
 

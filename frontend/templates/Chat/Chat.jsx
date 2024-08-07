@@ -64,6 +64,7 @@ import sendMessage from '@/services/chatbot/sendMessage';
 const Chat = ({ user }) => {
   // Local state for message input and chat history
   const [message, setMessage] = useState('');
+  const [quickActionResponse, setQuickActionResponse] = useState('');
   const [history, setHistory] = useState(() => {
     // Retrieve the saved history from local storage
     const savedHistory = localStorage.getItem('chatHistory');
@@ -72,11 +73,12 @@ const Chat = ({ user }) => {
   // Handle sending a message and updating the history
   const handleSendMessage = async () => {
     if (message.trim()) {
-      const topic = message.split(' ')[0];
+      const lowercasedMessage = message.toLowerCase();
+      const topic = lowercasedMessage.split(' ')[0];
       const newMessage = {
         id: history.length + 1,
         timestamp: new Date().toISOString(),
-        message,
+        message: lowercasedMessage,
         topic,
         userId: user.uid, //  Add user ID for data validation and storage
       };
@@ -100,17 +102,20 @@ const Chat = ({ user }) => {
 
   // Handle quick actions
   const handleQuickAction = (action) => {
+    let response;
     switch (action) {
       case 'suggest_techniques':
-        setMessage('Can you suggest some learning techniques?');
+        response = 'Can you suggest some learning techniques?';
         break;
       case 'recommend_books':
-        setMessage('Can you recommend some books?');
+        response = 'Can you recommend some books?';
         break;
-      // Add more cases for other quick actions
       default:
+        response = '';
         break;
     }
+    setMessage(response);
+    setQuickActionResponse(response); // Update state with the quick action response
   };
 
   // Function to clear chat history
@@ -140,6 +145,12 @@ const Chat = ({ user }) => {
     <div>
       {/* Quick Action Buttons */}
       <QuickActions onAction={handleQuickAction} />
+      {/* Displaying quick action response */}
+      {quickActionResponse && (
+        <div style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
+          <p>{quickActionResponse}</p>
+        </div>
+      )}
       {/* Displaying chat history */}
       <ChatHistory
         history={history}
