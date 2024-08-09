@@ -1,31 +1,30 @@
-import { ButtonGroup } from '@mui/material';
+import { Button, ButtonGroup } from '@mui/material';
 
 import styled from 'styled-components';
 
 export const StyledButtonGroup = styled(ButtonGroup)`
-  margin-bottom: 10px;
-  justify-content: center;
-  width: 100%;
-`;
-
-export const ChatContainer = styled.div`
+  margin-left: 10px; /* Adjust spacing if needed */
   display: flex;
-  flex-direction: column;
+  justify-content: space-evenly; /* Ensure even spacing */
+  width: 100%;
+`;
+
+export const StyledQuickActionButton = styled(Button)`
+  border: 2px solid purple;
+  color: purple;
+  display: flex;
   align-items: center;
-  padding: 10px;
 `;
 
-export const MessageInput = styled.div`
-  margin-top: 10px;
-  width: 100%;
-`;
+export const ActionIcon = styled.div`
+  color: blue;
+  cursor: pointer;
+  margin-right: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
 
-export const SendButton = styled.div`
-  margin-top: 10px;
-  width: 100%;
-`;
-
-export const HistoryContainer = styled.div`
-  width: 100%;
-  margin-top: 20px;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
