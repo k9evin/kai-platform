@@ -6,7 +6,7 @@ import {
   ActionIcon,
   StyledButtonGroup,
   StyledQuickActionButton,
-} from './Styles';
+} from './styles.js';
 
 const QuickActions = ({ onAction }) => {
   const [actionsVisible, setActionsVisible] = useState(false);
@@ -16,14 +16,54 @@ const QuickActions = ({ onAction }) => {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <ActionIcon onClick={toggleActions}>
-        {actionsVisible ? '-' : '+'} Actions
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <ActionIcon onClick={toggleActions} style={{ cursor: 'pointer' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '8px 12px',
+            backgroundColor: 'blue',
+            borderRadius: '24px',
+            border: '2px solid white',
+            color: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          <div
+            style={{
+              color: 'blue',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '8px',
+            }}
+          >
+            {actionsVisible ? '-' : '+'}
+          </div>
+          <span style={{ color: 'white' }}>Actions</span>
+        </div>
       </ActionIcon>
       {actionsVisible && (
         <StyledButtonGroup
-          variant="contained"
           aria-label="quick action buttons"
+          style={{
+            position: 'absolute',
+            bottom: '10px',
+            marginLeft: '700px',
+            marginBottom: '100px',
+            width: '50%',
+          }}
         >
           <StyledQuickActionButton
             onClick={() => {

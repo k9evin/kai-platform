@@ -3,14 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { ArrowDownwardOutlined, InfoOutlined } from '@mui/icons-material';
 
-import {
-  Button,
-  Fade,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Fade, Grid, IconButton, TextField, Typography } from '@mui/material';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase authentication libraries
 
@@ -142,36 +135,67 @@ const Chat = ({ user }) => {
     }
   };
   return (
-    <div>
-      {/* Quick Action Buttons */}
-      <QuickActions onAction={handleQuickAction} />
-      {/* Displaying quick action response */}
-      {quickActionResponse && (
-        <div style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
-          <p>{quickActionResponse}</p>
-        </div>
-      )}
-      {/* Displaying chat history */}
-      <ChatHistory
-        history={history}
-        onClearHistory={handleClearHistory}
-        setHistory={setHistory}
-      />
-      {/* Text field for typing message */}
-      <TextField
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyPress={handleKeyPress} // Add key press handler
-        label="Type your message"
-        fullWidth
-        InputProps={{
-          style: { color: 'darkblue' },
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '0',
+        width: '100%',
+        padding: '0 10px',
+        backgroundColor: '#fff',
+      }}
+    >
+      <div
+        style={{
+          paddingBottom: '100px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'left',
+          paddingRight: '100px',
         }}
-      />
-      {/* Button to send message */}
-      <Button onClick={handleSendMessage} variant="contained" color="primary">
-        Send
-      </Button>
+      >
+        {/* Displaying quick action response */}
+        {quickActionResponse && (
+          <div
+            style={{
+              padding: '10px',
+              backgroundColor: '#f0f0f0',
+              marginBottom: '10px',
+              alignSelf: 'flex-start',
+            }}
+          >
+            <p>{quickActionResponse}</p>
+          </div>
+        )}
+        {/* Displaying chat history */}
+        <ChatHistory
+          history={history}
+          onClearHistory={handleClearHistory}
+          setHistory={setHistory}
+          style={{ alignSelf: 'flex-start' }}
+        />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
+            width: '100%',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <QuickActions onAction={handleQuickAction} />
+          {/* Icon inside the chat box */}
+          <TextField
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Send a message"
+            fullWidth
+            InputProps={{
+              style: { color: 'darkblue' },
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

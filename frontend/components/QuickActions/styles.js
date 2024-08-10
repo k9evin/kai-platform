@@ -1,12 +1,15 @@
 import { Button, ButtonGroup } from '@mui/material';
-
 import styled from 'styled-components';
 
 export const StyledButtonGroup = styled(ButtonGroup)`
-  margin-left: 10px; /* Adjust spacing if needed */
+  margin-left: 10px;
   display: flex;
-  justify-content: space-evenly; /* Ensure even spacing */
+  justify-content: space-evenly;
   width: 100%;
+  border: none;
+  box-shadow: none;
+  border: none;
+  outline: none;
 `;
 
 export const StyledQuickActionButton = styled(Button)`
@@ -25,6 +28,10 @@ export const ActionIcon = styled.div`
   align-items: center;
 
   &:hover {
-    text-decoration: underline;
+    text-decoration: none;
+  }
+
+  &:active {
+    transform: none;
   }
 `;
